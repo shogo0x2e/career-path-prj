@@ -61,27 +61,22 @@ export function CurrentPositionTab({
                   <SkillBarItem
                     label="技術スキル"
                     value={currentVector.technicalSkill}
-                    color="bg-blue-500"
                   />
                   <SkillBarItem
                     label="問題解決能力"
                     value={currentVector.problemSolving}
-                    color="bg-green-500"
                   />
                   <SkillBarItem
                     label="コミュニケーション"
                     value={currentVector.communication}
-                    color="bg-yellow-500"
                   />
                   <SkillBarItem
                     label="リーダーシップ"
                     value={currentVector.leadership}
-                    color="bg-purple-500"
                   />
                   <SkillBarItem
                     label="ビジネス理解"
                     value={currentVector.businessAcumen}
-                    color="bg-red-500"
                   />
                 </div>
               </div>
