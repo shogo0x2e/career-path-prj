@@ -9,74 +9,8 @@ import { Card } from "@/components/ui/card";
 import { useAtom } from "jotai";
 import { evaluateState } from "@/atoms/evaluate-state";
 import { useRouter } from "next/navigation";
-
-// エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
-const careerVectors = {
-  "Software Engineer": {
-    technicalSkill: 3.5,
-    problemSolving: 3.5,
-    communication: 3.0,
-    leadership: 2.0,
-    businessAcumen: 2.0,
-    label: "ソフトウェアエンジニア",
-  },
-  "Tech Lead": {
-    technicalSkill: 4.5,
-    problemSolving: 4.0,
-    communication: 3.5,
-    leadership: 3.5,
-    businessAcumen: 2.5,
-    label: "テックリード",
-  },
-  "Engineering Manager": {
-    technicalSkill: 3.0,
-    problemSolving: 3.5,
-    communication: 4.0,
-    leadership: 4.5,
-    businessAcumen: 3.5,
-    label: "エンジニアリングマネージャー",
-  },
-  "Product Manager": {
-    technicalSkill: 2.5,
-    problemSolving: 4.0,
-    communication: 4.5,
-    leadership: 3.5,
-    businessAcumen: 4.5,
-    label: "プロダクトマネージャー",
-  },
-  "DevOps Engineer": {
-    technicalSkill: 4.0,
-    problemSolving: 4.0,
-    communication: 3.0,
-    leadership: 2.5,
-    businessAcumen: 2.5,
-    label: "DevOpsエンジニア",
-  },
-  "Full-stack Developer": {
-    technicalSkill: 4.0,
-    problemSolving: 3.8,
-    communication: 3.2,
-    leadership: 2.5,
-    businessAcumen: 2.8,
-    label: "フルスタック開発者",
-  },
-  "Frontend Developer": {
-    technicalSkill: 3.8,
-    problemSolving: 3.5,
-    communication: 3.3,
-    leadership: 2.0,
-    businessAcumen: 2.5,
-    label: "フロントエンド開発者",
-  },
-  "Backend Developer": {
-    technicalSkill: 4.2,
-    problemSolving: 3.7,
-    communication: 2.8,
-    leadership: 2.0,
-    businessAcumen: 2.2,
-    label: "バックエンド開発者",
-  },
-};
+import { getDistance } from "@/utils/get-ditance";
+import { careerVectors } from "@/constants/career-vectors";
 
 const tabs = [
   { id: "current", label: "あなたの現在地" },
@@ -153,7 +87,40 @@ const ResultPage = () => {
                   //   careerVectors={careerVectors}
                   //   isLoading={isLoading}
                   // />
-                  <pre>{JSON.stringify(evaluatedState, null, 2)}</pre>
+                  <div className="space-y-6">
+                    <h2 className="text-xl font-semibold">
+                      あなたの目標に近いキャリアパス
+                    </h2>
+                    {Object.entries(careerVectors)
+                      .map(([key, vector]) => ({
+                        key,
+                        vector,
+                        distance: getDistance(
+                          {
+                            ...evaluatedState.hardSkillEvaluation.desired,
+                            ...evaluatedState.softSkillEvaluation.desired,
+                          },
+                          vector
+                        ),
+                      }))
+                      .sort((a, b) => a.distance - b.distance)
+                      .slice(0, 3)
+                      .map(({ key, vector, distance }) => (
+                        <Card key={key} className="p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="text-lg font-medium">
+                                {vector.label}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                スキルベクトル類似度:{" "}
+                                {(1 - distance / Math.sqrt(56)).toFixed(2)}
+                              </p>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
                 )}
               </>
             )}

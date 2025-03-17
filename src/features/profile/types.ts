@@ -16,3 +16,6 @@ export type ProfileEvaluatedData = {
   softSkillEvaluation: SoftSkillEvaluation;
   profileSummary: ProfileSummary;
 };
+
+export type CareerVector = SoftSkillEvaluation["current"] &
+  HardSkillEvaluation["current"];
