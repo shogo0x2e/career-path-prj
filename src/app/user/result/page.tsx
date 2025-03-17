@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Tabs } from "@/components/tabs/Tabs";
-import { CurrentPositionTab } from "@/components/tabs/current-position/CurrentPositionTab";
-import { MarketPositionTab } from "@/components/tabs/market-position/MarketPositionTab";
+import { CurrentPositionTab } from "@/features/result/components/CurrentPositionTab";
+import { MarketPositionTab } from "@/features/result/components/MarketPositionTab";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 

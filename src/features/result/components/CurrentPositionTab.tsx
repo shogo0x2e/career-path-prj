@@ -1,5 +1,5 @@
 import { ProfileInfo } from "./ProfileInfo";
-import { SkillAnalysisChart } from "../market-position/SkillAnalysisChart";
+import { SkillAnalysisChart } from "@/features/result/components/SkillAnalysisChart";
 import { SkillBarItem } from "./SkillBarItem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

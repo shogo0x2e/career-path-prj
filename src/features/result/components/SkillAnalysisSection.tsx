@@ -1,5 +1,5 @@
-import { SkillAnalysisChart } from "../market-position/SkillAnalysisChart";
-import { CareerRecommendation } from "../market-position/CareerRecommendation";
+import { SkillAnalysisChart } from "@/features/result/components/SkillAnalysisChart";
+import { CareerRecommendation } from "@/features/result/components/CareerRecommendation";
 
 type SkillVector = {
   technicalSkill: number;
