@@ -86,19 +86,21 @@ const ResultPage = () => {
                       .sort((a, b) => a.distance - b.distance)
                       .slice(0, 3)
                       .map(({ key, vector, distance }) => (
-                        <Card key={key} className="p-4">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h3 className="text-lg font-medium">
-                                {vector.label}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                スキルベクトル類似度:{" "}
-                                {(1 - distance / Math.sqrt(56)).toFixed(2)}
-                              </p>
+                        <Link href={`/my/${key}/roadmap`} key={key}>
+                          <Card key={key} className="p-4">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <h3 className="text-lg font-medium">
+                                  {vector.label}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  スキルベクトル類似度:{" "}
+                                  {(1 - distance / Math.sqrt(56)).toFixed(2)}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </Card>
+                          </Card>
+                        </Link>
                       ))}
                   </div>
                 )}
