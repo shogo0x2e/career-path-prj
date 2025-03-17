@@ -3,9 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Tabs } from "@/components/Tabs";
-import { CurrentPositionTab } from "@/components/CurrentPositionTab";
-import { MarketPositionTab } from "@/components/MarketPositionTab";
+import { Tabs } from "@/components/tabs/Tabs";
+import { CurrentPositionTab } from "@/components/tabs/current-position/CurrentPositionTab";
+import { MarketPositionTab } from "@/components/tabs/market-position/MarketPositionTab";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -171,10 +171,10 @@ export default function DisplayPage() {
         } else {
             setIsLoading(false);
         }
-    }, [searchParams]);
+    }, [searchParams, findMatchingCareers]);
 
     // ターゲットベクトルに最も近いキャリアを見つける関数
-    function findMatchingCareers(targetVector) {
+    function findMatchingCareers(targetVector: { technicalSkill: number; problemSolving: number; communication: number; leadership: number; businessAcumen: number; }) {
         const careers = Object.keys(careerVectors);
         const distances = careers.map(career => {
             const vector = careerVectors[career];
