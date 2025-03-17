@@ -4,15 +4,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-    Radar,
-    RadarChart,
-    PolarGrid,
-    PolarAngleAxis,
-    PolarRadiusAxis,
-    ResponsiveContainer,
-    Legend
-} from "recharts";
+import { ProfileInfo } from "@/components/ProfileInfo";
+import { SkillAnalysisSection } from "@/components/SkillAnalysisSection";
 
 // エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
 const careerVectors = {
@@ -221,15 +214,6 @@ export default function DisplayPage() {
         return advice;
     }
 
-    // レーダーチャート用のデータ整形
-    const chartData = [
-        { subject: '技術スキル', currentValue: analysis.currentVector.technicalSkill, targetValue: analysis.targetVector.technicalSkill, fullMark: 5 },
-        { subject: '問題解決', currentValue: analysis.currentVector.problemSolving, targetValue: analysis.targetVector.problemSolving, fullMark: 5 },
-        { subject: 'コミュニケーション', currentValue: analysis.currentVector.communication, targetValue: analysis.targetVector.communication, fullMark: 5 },
-        { subject: 'リーダーシップ', currentValue: analysis.currentVector.leadership, targetValue: analysis.targetVector.leadership, fullMark: 5 },
-        { subject: 'ビジネス理解', currentValue: analysis.currentVector.businessAcumen, targetValue: analysis.targetVector.businessAcumen, fullMark: 5 },
-    ];
-
     return (
         <div className="max-w-3xl mx-auto py-10 px-4">
             <div className="flex flex-col space-y-6">
@@ -245,112 +229,19 @@ export default function DisplayPage() {
                     "border border-gray-200"
                 )}>
                     <div className="space-y-8">
-                        {/* 基本情報セクション */}
-                        <div>
-                            <h2 className="text-xl font-semibold mb-2">基本情報</h2>
-                            <hr className="mb-3" />
+                        <ProfileInfo
+                            name={profileData.name}
+                            email={profileData.email}
+                            canDo={profileData.canDo}
+                            wantToDo={profileData.wantToDo}
+                            dontWantToDo={profileData.dontWantToDo}
+                        />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm text-gray-600">氏名</p>
-                                    <p className="font-medium">{profileData.name}</p>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-gray-600">メールアドレス</p>
-                                    <p className="font-medium">{profileData.email}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* できること */}
-                        <div>
-                            <h2 className="text-xl font-semibold mb-2 text-emerald-700">できること</h2>
-                            <hr className="mb-3 border-emerald-200" />
-                            <div className="bg-emerald-50 p-4 rounded-md">
-                                <p className="whitespace-pre-wrap">
-                                    {profileData.canDo || "未入力"}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* やりたいこと */}
-                        <div>
-                            <h2 className="text-xl font-semibold mb-2 text-blue-700">やりたいこと</h2>
-                            <hr className="mb-3 border-blue-200" />
-                            <div className="bg-blue-50 p-4 rounded-md">
-                                <p className="whitespace-pre-wrap">
-                                    {profileData.wantToDo || "未入力"}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* やりたくないこと */}
-                        <div>
-                            <h2 className="text-xl font-semibold mb-2 text-red-700">やりたくないこと</h2>
-                            <hr className="mb-3 border-red-200" />
-                            <div className="bg-red-50 p-4 rounded-md">
-                                <p className="whitespace-pre-wrap">
-                                    {profileData.dontWantToDo || "未入力"}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* スキルレーダーチャート */}
-                        <div>
-                            <h2 className="text-xl font-semibold mb-2 text-purple-700">スキル分析</h2>
-                            <hr className="mb-3 border-purple-200" />
-
-                            {isLoading ? (
-                                <div className="flex justify-center items-center h-60">
-                                    <p className="text-gray-500">分析中...</p>
-                                </div>
-                            ) : (
-                                <div className="bg-white p-4 rounded-md border border-gray-200">
-                                    <div className="aspect-square max-h-[400px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart outerRadius="80%" data={chartData}>
-                                                <PolarGrid stroke="#e5e7eb" />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 12 }} />
-                                                <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fontSize: 10 }} />
-
-                                                <Radar
-                                                    name="現在のスキル"
-                                                    dataKey="currentValue"
-                                                    stroke="#6366f1"
-                                                    fill="#818cf8"
-                                                    fillOpacity={0.5}
-                                                />
-
-                                                <Radar
-                                                    name="目標スキル"
-                                                    dataKey="targetValue"
-                                                    stroke="#8b5cf6"
-                                                    fill="#a78bfa"
-                                                    fillOpacity={0.3}
-                                                />
-
-                                                <Legend wrapperStyle={{ paddingTop: 20 }} />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-
-                                    <div className="mt-6 pt-4 border-t border-gray-100">
-                                        <h3 className="font-medium text-lg mb-3">分析結果</h3>
-                                        <p className="mb-4 text-gray-700">{analysis.careerAdvice}</p>
-
-                                        <h4 className="font-medium text-md mb-2">推奨キャリアパス:</h4>
-                                        <ul className="list-disc ml-5 space-y-1 text-gray-700">
-                                            {analysis.matchingCareers.map((career, idx) => (
-                                                <li key={idx} className="font-medium">
-                                                    {careerVectors[career].label}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <SkillAnalysisSection
+                            isLoading={isLoading}
+                            analysis={analysis}
+                            careerVectors={careerVectors}
+                        />
                     </div>
                 </div>
 
