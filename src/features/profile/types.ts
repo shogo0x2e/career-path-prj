@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { HardSkillEvaluation } from "./actions/generateHardSkillEvaluationPrompt";
+import { SoftSkillEvaluation } from "./actions/generateSoftSkillEvaluationPrompt";
 
 export const ProfileInputSchema = z.object({
   currentSkills: z.string().min(1),
@@ -9,6 +11,6 @@ export const ProfileInputSchema = z.object({
 export type ProfileInput = z.infer<typeof ProfileInputSchema>;
 
 export type ProfileEvaluatedVectors = {
-  currentPosition: number[];
-  desiredPosition: number[];
+  hardSkillEvaluation: HardSkillEvaluation;
+  softSkillEvaluation: SoftSkillEvaluation;
 };
