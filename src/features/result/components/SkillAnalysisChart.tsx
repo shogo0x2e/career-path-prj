@@ -70,7 +70,7 @@ export function SkillAnalysisChart({
             dataKey="subject"
             tick={{ fill: "#4b5563", fontSize: 12 }}
           />
-          <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fontSize: 10 }} />
+                  <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fontSize: 10 }} />
 
           <Radar
             name="現在のスキル"
