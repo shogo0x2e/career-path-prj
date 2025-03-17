@@ -25,26 +25,6 @@ const ResultPage = () => {
     return null;
   }
 
-  const analysis = {
-    currentVector: {
-      technicalSkill: 3.5,
-      problemSolving: 3.5,
-      communication: 3.0,
-      leadership: 2.0,
-      businessAcumen: 2.0,
-    },
-    targetVector: {
-      technicalSkill: 4.0,
-      problemSolving: 4.0,
-      communication: 3.5,
-      leadership: 3.0,
-      businessAcumen: 2.5,
-    },
-    matchingCareers: ["Software Engineer", "Tech Lead", "Engineering Manager"],
-    careerAdvice:
-      "あなたの経験とスキルを分析した結果、ソフトウェアエンジニアの適性が最も高いと判断されました。",
-  };
-
   const isLoading = false;
 
   return (
