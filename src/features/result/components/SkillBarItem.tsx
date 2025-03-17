@@ -4,14 +4,12 @@ type SkillBarItemProps = {
   label: string;
   value: number;
   maxValue?: number;
-  color?: string;
 };
 
 export function SkillBarItem({
   label,
   value,
   maxValue = 5,
-  color = "bg-primary",
 }: SkillBarItemProps) {
   const percentage = (value / maxValue) * 100;
 
@@ -23,7 +21,7 @@ export function SkillBarItem({
           {value.toFixed(1)}/{maxValue}.0
         </span>
       </div>
-      <Progress value={percentage} className={color} />
+      <Progress value={percentage}  />
     </div>
   );
 }
