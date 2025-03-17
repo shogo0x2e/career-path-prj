@@ -1,26 +1,58 @@
 "use server";
 
-import { generateHardSkillEvaluationPrompt } from "@/features/profile/actions/generateHardSkillEvaluationPrompt";
+import {
+  generateHardSkillEvaluationPrompt,
+  hardSkillEvaluationSchema,
+} from "@/features/profile/actions/generateHardSkillEvaluationPrompt";
 import { retrieveChatCompletion } from "@/features/openai/actions/retrieveChatCompletion";
-import { ProfileEvaluatedVectors } from "../types";
-import { ProfileInput } from "../types";
-import { generateSoftSkillEvaluationPrompt } from "./generateSoftSkillEvaluationPrompt";
+import { ProfileEvaluatedData, ProfileInput } from "../types";
+import {
+  generateSoftSkillEvaluationPrompt,
+  softSkillEvaluationSchema,
+} from "./generateSoftSkillEvaluationPrompt";
+import {
+  generateProfileSummary,
+  profileSummarySchema,
+} from "./generateProfileSummary";
 
+/**
+ * 入力されたプロフィールをソフトスキルとハードスキルの評価軸に基づいて評価する
+ * @param profile プロフィール
+ * @returns ソフトスキルとハードスキルの評価
+ */
 export const evaluateProfile = async (
   profile: ProfileInput
-): Promise<ProfileEvaluatedVectors> => {
-  const [hardSkillEvaluation, softSkillEvaluation] = await Promise.all(
-    [
-      generateHardSkillEvaluationPrompt(profile),
-      generateSoftSkillEvaluationPrompt(profile),
-    ].map(async (prompt) => {
-      const completion = await retrieveChatCompletion(prompt);
-      return JSON.parse(completion.choices[0].message.content);
-    })
+): Promise<ProfileEvaluatedData> => {
+  const [hardSkillCompletion, softSkillCompletion, profileSummaryCompletion] =
+    await Promise.all(
+      [
+        generateHardSkillEvaluationPrompt(profile),
+        generateSoftSkillEvaluationPrompt(profile),
+        generateProfileSummary(profile),
+      ].map(async (prompt) => {
+        const completion = await retrieveChatCompletion(prompt);
+
+        if (!completion) {
+          throw new Error("Failed to retrieve chat completion");
+        }
+
+        return completion;
+      })
+    );
+
+  const hardSkillEvaluation = hardSkillEvaluationSchema.parse(
+    JSON.parse(hardSkillCompletion)
+  );
+  const softSkillEvaluation = softSkillEvaluationSchema.parse(
+    JSON.parse(softSkillCompletion)
+  );
+  const profileSummary = profileSummarySchema.parse(
+    JSON.parse(profileSummaryCompletion)
   );
 
   return {
     hardSkillEvaluation,
     softSkillEvaluation,
+    profileSummary,
   };
 };

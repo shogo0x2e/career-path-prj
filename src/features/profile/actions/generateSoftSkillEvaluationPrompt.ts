@@ -1,17 +1,21 @@
 import { ProfileInput } from "../types";
 
-export type SoftSkillEvaluation = {
-  current: {
-    communication: number;
-    teamwork: number;
-    leadership: number;
-  };
-  desired: {
-    communication: number;
-    teamwork: number;
-    leadership: number;
-  };
-};
+import { z } from "zod";
+
+export const softSkillEvaluationSchema = z.object({
+  current: z.object({
+    communication: z.number(),
+    teamwork: z.number(),
+    leadership: z.number(),
+  }),
+  desired: z.object({
+    communication: z.number(),
+    teamwork: z.number(),
+    leadership: z.number(),
+  }),
+});
+
+export type SoftSkillEvaluation = z.infer<typeof softSkillEvaluationSchema>;
 
 export const generateSoftSkillEvaluationPrompt = (profile: ProfileInput) => {
   return `
@@ -35,16 +39,19 @@ export const generateSoftSkillEvaluationPrompt = (profile: ProfileInput) => {
 
   # 出力形式
   {
-    current: {
-      communication: 0,
-      teamwork: 0,
-      leadership: 0,
+    "current": {
+      "communication": 0,
+      "teamwork": 0,
+      "leadership": 0,
     },
-    desired: {
-      communication: 0,
-      teamwork: 0,
-      leadership: 0,
+    "desired": {
+      "communication": 0,
+      "teamwork": 0,
+      "leadership": 0,
     },
   }
+
+  # 注意
+  必ず有効な JSON 形式で出力してください。その他の説明は一切不要です。
   `;
 };

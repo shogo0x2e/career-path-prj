@@ -1,41 +1,32 @@
 import { ProfileInfo } from "./ProfileInfo";
 import { SkillAnalysisChart } from "@/features/result/components/SkillAnalysisChart";
-import { SkillBarItem } from "./SkillBarItem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { HardSkillEvaluation } from "@/features/profile/actions/generateHardSkillEvaluationPrompt";
+import { SoftSkillEvaluation } from "@/features/profile/actions/generateSoftSkillEvaluationPrompt";
 
 type ProfileDataType = {
-  name: string;
-  email: string;
   canDo: string;
   wantToDo: string;
   dontWantToDo: string;
 };
 
-type SkillVector = {
-  technicalSkill: number;
-  problemSolving: number;
-  communication: number;
-  leadership: number;
-  businessAcumen: number;
-};
+type SkillEvaluation = SoftSkillEvaluation & HardSkillEvaluation;
 
 type CurrentPositionTabProps = {
   profileData: ProfileDataType;
-  currentVector: SkillVector;
+  skillEvaluation: SkillEvaluation;
   isLoading: boolean;
 };
 
 export function CurrentPositionTab({
   profileData,
-  currentVector,
+  skillEvaluation,
   isLoading,
 }: CurrentPositionTabProps) {
   return (
     <div className="space-y-8">
       <ProfileInfo
-        name={profileData.name}
-        email={profileData.email}
         canDo={profileData.canDo}
         wantToDo={profileData.wantToDo}
         dontWantToDo={profileData.dontWantToDo}
@@ -57,12 +48,12 @@ export function CurrentPositionTab({
             <div>
               <div className="max-w-md mx-auto">
                 <SkillAnalysisChart
-                  currentVector={currentVector}
+                  skillEvaluation={skillEvaluation}
                   showCurrentOnly={true}
                 />
               </div>
 
-              <div className="mt-6 pt-4 border-t border-muted">
+              {/* <div className="mt-6 pt-4 border-t border-muted">
                 <h3 className="font-medium text-lg mb-3">スキル分析</h3>
                 <div className="space-y-4">
                   <SkillBarItem
@@ -91,7 +82,7 @@ export function CurrentPositionTab({
                     color="bg-red-500"
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
         </CardContent>

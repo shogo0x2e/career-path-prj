@@ -6,6 +6,9 @@ import { CurrentPositionTab } from "@/features/result/components/CurrentPosition
 import { MarketPositionTab } from "@/features/result/components/MarketPositionTab";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAtom } from "jotai";
+import { evaluateState } from "@/atoms/evaluate-state";
+import { useRouter } from "next/navigation";
 
 // エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
 const careerVectors = {
@@ -81,13 +84,12 @@ const tabs = [
 ];
 
 const ResultPage = () => {
-  const profileData = {
-    name: "山田 太郎",
-    email: "yama@example.com",
-    canDo: "ソフトウェア開発、データ分析、ビジネスモデリング",
-    wantToDo: "データサイエンスの専門家として活躍",
-    dontWantToDo: "マーケティングのコンサルタントとして働くこと",
-  };
+  const [evaluatedState] = useAtom(evaluateState);
+  const router = useRouter();
+  if (!evaluatedState) {
+    router.push("/my/assessment");
+    return null;
+  }
 
   const analysis = {
     currentVector: {
@@ -124,18 +126,34 @@ const ResultPage = () => {
               <>
                 {activeTabId === "current" && (
                   <CurrentPositionTab
-                    profileData={profileData}
-                    currentVector={analysis.currentVector}
+                    profileData={{
+                      canDo: evaluatedState?.profileSummary.currentSkills,
+                      wantToDo:
+                        evaluatedState?.profileSummary.desiredWork ??
+                        "まだ見つかっていない",
+                      dontWantToDo: evaluatedState?.profileSummary.unwantedWork,
+                    }}
+                    skillEvaluation={{
+                      current: {
+                        ...evaluatedState.hardSkillEvaluation.current,
+                        ...evaluatedState.softSkillEvaluation.current,
+                      },
+                      desired: {
+                        ...evaluatedState.hardSkillEvaluation.desired,
+                        ...evaluatedState.softSkillEvaluation.desired,
+                      },
+                    }}
                     isLoading={isLoading}
                   />
                 )}
 
                 {activeTabId === "market" && (
-                  <MarketPositionTab
-                    analysis={analysis}
-                    careerVectors={careerVectors}
-                    isLoading={isLoading}
-                  />
+                  // <MarketPositionTab
+                  //   analysis={analysis}
+                  //   careerVectors={careerVectors}
+                  //   isLoading={isLoading}
+                  // />
+                  <pre>{JSON.stringify(evaluatedState, null, 2)}</pre>
                 )}
               </>
             )}

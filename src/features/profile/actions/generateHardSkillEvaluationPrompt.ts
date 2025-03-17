@@ -1,19 +1,23 @@
 import { ProfileInput } from "@/features/profile/types";
 
-export type HardSkillEvaluation = {
-  current: {
-    programming: number;
-    database: number;
-    softwareDevelopment: number;
-    systemDesign: number;
-  };
-  desired: {
-    programming: number;
-    database: number;
-    softwareDevelopment: number;
-    systemDesign: number;
-  };
-};
+import { z } from "zod";
+
+export const hardSkillEvaluationSchema = z.object({
+  current: z.object({
+    programming: z.number(),
+    database: z.number(),
+    softwareDevelopment: z.number(),
+    systemDesign: z.number(),
+  }),
+  desired: z.object({
+    programming: z.number(),
+    database: z.number(),
+    softwareDevelopment: z.number(),
+    systemDesign: z.number(),
+  }),
+});
+
+export type HardSkillEvaluation = z.infer<typeof hardSkillEvaluationSchema>;
 
 export const generateHardSkillEvaluationPrompt = (profile: ProfileInput) => {
   return `
@@ -38,18 +42,21 @@ export const generateHardSkillEvaluationPrompt = (profile: ProfileInput) => {
 
   # 出力形式
   {
-    current: {
-      programming: 0,
-      database: 0,
-      softwareDevelopment: 0,
-      systemDesign: 0,
+    "current": {
+      "programming": 0,
+      "database": 0,
+      "softwareDevelopment": 0,
+      "systemDesign": 0,
     },
-    desired: {
-      programming: 0,
-      database: 0,
-      softwareDevelopment: 0,
-      systemDesign: 0,
+    "desired": {
+      "programming": 0,
+      "database": 0,
+      "softwareDevelopment": 0,
+      "systemDesign": 0,
     },
   }
+
+  # 注意
+  必ず有効な JSON 形式で出力してください。その他の説明は一切不要です。
   `;
 };

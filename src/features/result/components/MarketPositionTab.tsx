@@ -2,16 +2,12 @@ import { SkillAnalysisChart } from "./SkillAnalysisChart";
 import { CareerRecommendation } from "./CareerRecommendation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { HardSkillEvaluation } from "@/features/profile/actions/generateHardSkillEvaluationPrompt";
+import { SoftSkillEvaluation } from "@/features/profile/actions/generateSoftSkillEvaluationPrompt";
 
-type SkillVector = {
-  technicalSkill: number;
-  problemSolving: number;
-  communication: number;
-  leadership: number;
-  businessAcumen: number;
-};
+type SkillEvaluation = HardSkillEvaluation & SoftSkillEvaluation;
 
-type CareerVectorType = SkillVector & {
+type CareerVectorType = SkillEvaluation & {
   label: string;
 };
 
@@ -21,8 +17,7 @@ type CareerVectorsType = {
 
 type MarketPositionTabProps = {
   analysis: {
-    currentVector: SkillVector;
-    targetVector: SkillVector;
+    skillEvaluation: SkillEvaluation;
     matchingCareers: string[];
     careerAdvice: string;
   };
@@ -53,16 +48,15 @@ export function MarketPositionTab({
             <div>
               <div className="max-w-md mx-auto">
                 <SkillAnalysisChart
-                  currentVector={analysis.currentVector}
-                  targetVector={analysis.targetVector}
+                  skillEvaluation={analysis.skillEvaluation}
                 />
               </div>
 
-              <CareerRecommendation
+              {/* <CareerRecommendation
                 careerAdvice={analysis.careerAdvice}
                 matchingCareers={analysis.matchingCareers}
                 careerVectors={careerVectors}
-              />
+              /> */}
             </div>
           )}
         </CardContent>
@@ -82,7 +76,7 @@ export function MarketPositionTab({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {analysis.matchingCareers.slice(0, 2).map((career) => (
+              {/* {analysis.matchingCareers.slice(0, 2).map((career) => (
                 <Card key={career} className="overflow-hidden">
                   <CardHeader className="bg-muted pb-2">
                     <CardTitle className="text-base">
@@ -134,7 +128,7 @@ export function MarketPositionTab({
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              ))} */}
             </div>
           )}
         </CardContent>
@@ -143,40 +137,40 @@ export function MarketPositionTab({
   );
 }
 
-function SkillComparisonItem({
-  label,
-  value,
-  gap,
-}: {
-  label: string;
-  value: number;
-  gap: number;
-}) {
-  const percentage = (value / 5) * 100;
+// function SkillComparisonItem({
+//   label,
+//   value,
+//   gap,
+// }: {
+//   label: string;
+//   value: number;
+//   gap: number;
+// }) {
+//   const percentage = (value / 5) * 100;
 
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium">{label}</span>
-        <div className="flex items-center">
-          <span className="text-sm font-medium">{value.toFixed(1)}</span>
-          {gap !== 0 && (
-            <span
-              className={`ml-1 text-xs ${
-                gap > 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {gap > 0 ? `+${gap.toFixed(1)}` : gap.toFixed(1)}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="w-full bg-secondary h-2 rounded-full">
-        <div
-          className="h-2 rounded-full bg-primary"
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div className="space-y-1">
+//       <div className="flex justify-between items-center">
+//         <span className="text-sm font-medium">{label}</span>
+//         <div className="flex items-center">
+//           <span className="text-sm font-medium">{value.toFixed(1)}</span>
+//           {gap !== 0 && (
+//             <span
+//               className={`ml-1 text-xs ${
+//                 gap > 0 ? "text-green-600" : "text-red-600"
+//               }`}
+//             >
+//               {gap > 0 ? `+${gap.toFixed(1)}` : gap.toFixed(1)}
+//             </span>
+//           )}
+//         </div>
+//       </div>
+//       <div className="w-full bg-secondary h-2 rounded-full">
+//         <div
+//           className="h-2 rounded-full bg-primary"
+//           style={{ width: `${percentage}%` }}
+//         ></div>
+//       </div>
+//     </div>
+//   );
+// }
