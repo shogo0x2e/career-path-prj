@@ -1,3 +1,5 @@
+import { Badge } from "@/components/ui/badge";
+
 type CareerVectorsType = {
     [key: string]: {
         technicalSkill: number;
@@ -21,18 +23,22 @@ export function CareerRecommendation({
     careerVectors
 }: CareerRecommendationProps) {
     return (
-        <div className="mt-6 pt-4 border-t border-gray-100">
+        <div className="mt-6 pt-4 border-t border-muted">
             <h3 className="font-medium text-lg mb-3">分析結果</h3>
-            <p className="mb-4 text-gray-700">{careerAdvice}</p>
+            <p className="mb-4 text-muted-foreground">{careerAdvice}</p>
 
             <h4 className="font-medium text-md mb-2">推奨キャリアパス:</h4>
-            <ul className="list-disc ml-5 space-y-1 text-gray-700">
+            <div className="flex flex-wrap gap-2">
                 {matchingCareers.map((career, idx) => (
-                    <li key={idx} className="font-medium">
+                    <Badge
+                        key={idx}
+                        variant="secondary"
+                        className="text-base px-3 py-1"
+                    >
                         {careerVectors[career].label}
-                    </li>
+                    </Badge>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

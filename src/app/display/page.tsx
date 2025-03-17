@@ -3,9 +3,11 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { ProfileInfo } from "@/components/ProfileInfo";
-import { SkillAnalysisSection } from "@/components/SkillAnalysisSection";
+import { Tabs } from "@/components/Tabs";
+import { CurrentPositionTab } from "@/components/CurrentPositionTab";
+import { MarketPositionTab } from "@/components/MarketPositionTab";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 // エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
 const careerVectors = {
@@ -74,6 +76,11 @@ const careerVectors = {
         label: "バックエンド開発者"
     },
 };
+
+const tabs = [
+    { id: "current", label: "あなたの現在地" },
+    { id: "market", label: "市場におけるあなたの役割" }
+];
 
 export default function DisplayPage() {
     const searchParams = useSearchParams();
@@ -217,46 +224,39 @@ export default function DisplayPage() {
     return (
         <div className="max-w-3xl mx-auto py-10 px-4">
             <div className="flex flex-col space-y-6">
-                <h1 className={cn(
-                    "text-2xl md:text-3xl font-bold",
-                    "text-center md:text-left"
-                )}>
+                <h1 className="text-2xl md:text-3xl font-bold text-center md:text-left">
                     キャリア分析結果
                 </h1>
 
-                <div className={cn(
-                    "bg-white shadow-md rounded-lg p-6",
-                    "border border-gray-200"
-                )}>
-                    <div className="space-y-8">
-                        <ProfileInfo
-                            name={profileData.name}
-                            email={profileData.email}
-                            canDo={profileData.canDo}
-                            wantToDo={profileData.wantToDo}
-                            dontWantToDo={profileData.dontWantToDo}
-                        />
+                <Card className="p-6">
+                    <Tabs tabs={tabs} defaultTabId="current">
+                        {(activeTabId) => (
+                            <>
+                                {activeTabId === "current" && (
+                                    <CurrentPositionTab
+                                        profileData={profileData}
+                                        currentVector={analysis.currentVector}
+                                        isLoading={isLoading}
+                                    />
+                                )}
 
-                        <SkillAnalysisSection
-                            isLoading={isLoading}
-                            analysis={analysis}
-                            careerVectors={careerVectors}
-                        />
-                    </div>
-                </div>
+                                {activeTabId === "market" && (
+                                    <MarketPositionTab
+                                        analysis={analysis}
+                                        careerVectors={careerVectors}
+                                        isLoading={isLoading}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </Tabs>
+                </Card>
 
                 <div className="flex justify-center md:justify-start">
                     <Link href="/profile" passHref>
-                        <button
-                            className={cn(
-                                "px-6 py-2",
-                                "bg-gray-200 text-gray-800 font-medium rounded-md",
-                                "hover:bg-gray-300 transition-colors",
-                                "focus:outline-none focus:ring-2 focus:ring-gray-500"
-                            )}
-                        >
+                        <Button variant="outline">
                             入力画面に戻る
-                        </button>
+                        </Button>
                     </Link>
                 </div>
             </div>

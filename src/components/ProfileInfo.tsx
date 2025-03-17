@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type ProfileInfoProps = {
     name: string;
@@ -10,57 +11,68 @@ type ProfileInfoProps = {
 
 export function ProfileInfo({ name, email, canDo, wantToDo, dontWantToDo }: ProfileInfoProps) {
     return (
-        <>
-            {/* 基本情報セクション */}
-            <div>
-                <h2 className="text-xl font-semibold mb-2">基本情報</h2>
-                <hr className="mb-3" />
+        <div className="space-y-6">
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-xl">基本情報</CardTitle>
+                </CardHeader>
+                <Separator />
+                <CardContent className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm text-muted-foreground">氏名</p>
+                            <p className="font-medium">{name}</p>
+                        </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p className="text-sm text-gray-600">氏名</p>
-                        <p className="font-medium">{name}</p>
+                        <div>
+                            <p className="text-sm text-muted-foreground">メールアドレス</p>
+                            <p className="font-medium">{email}</p>
+                        </div>
                     </div>
+                </CardContent>
+            </Card>
 
-                    <div>
-                        <p className="text-sm text-gray-600">メールアドレス</p>
-                        <p className="font-medium">{email}</p>
+            <Card className="border-emerald-200">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-xl text-emerald-700">できること</CardTitle>
+                </CardHeader>
+                <Separator className="bg-emerald-200" />
+                <CardContent className="pt-4">
+                    <div className="bg-emerald-50 p-4 rounded-md">
+                        <p className="whitespace-pre-wrap">
+                            {canDo || "未入力"}
+                        </p>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
-            {/* できること */}
-            <div>
-                <h2 className="text-xl font-semibold mb-2 text-emerald-700">できること</h2>
-                <hr className="mb-3 border-emerald-200" />
-                <div className="bg-emerald-50 p-4 rounded-md">
-                    <p className="whitespace-pre-wrap">
-                        {canDo || "未入力"}
-                    </p>
-                </div>
-            </div>
+            <Card className="border-blue-200">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-xl text-blue-700">やりたいこと</CardTitle>
+                </CardHeader>
+                <Separator className="bg-blue-200" />
+                <CardContent className="pt-4">
+                    <div className="bg-blue-50 p-4 rounded-md">
+                        <p className="whitespace-pre-wrap">
+                            {wantToDo || "未入力"}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
 
-            {/* やりたいこと */}
-            <div>
-                <h2 className="text-xl font-semibold mb-2 text-blue-700">やりたいこと</h2>
-                <hr className="mb-3 border-blue-200" />
-                <div className="bg-blue-50 p-4 rounded-md">
-                    <p className="whitespace-pre-wrap">
-                        {wantToDo || "未入力"}
-                    </p>
-                </div>
-            </div>
-
-            {/* やりたくないこと */}
-            <div>
-                <h2 className="text-xl font-semibold mb-2 text-red-700">やりたくないこと</h2>
-                <hr className="mb-3 border-red-200" />
-                <div className="bg-red-50 p-4 rounded-md">
-                    <p className="whitespace-pre-wrap">
-                        {dontWantToDo || "未入力"}
-                    </p>
-                </div>
-            </div>
-        </>
+            <Card className="border-red-200">
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-xl text-red-700">やりたくないこと</CardTitle>
+                </CardHeader>
+                <Separator className="bg-red-200" />
+                <CardContent className="pt-4">
+                    <div className="bg-red-50 p-4 rounded-md">
+                        <p className="whitespace-pre-wrap">
+                            {dontWantToDo || "未入力"}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
