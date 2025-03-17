@@ -29,7 +29,7 @@ export function Timeline({ items, currentPosition, targetCareer }: TimelineProps
       </div>
 
       {/* タイムラインアイテム */}
-      {items.map((item, index) => (
+      {items.map((item) => (
         <div key={item.id} className="mb-10">
           <div className="absolute left-[-9px] w-4 h-4 rounded-full bg-primary z-10" />
           <div className="flex items-center">
