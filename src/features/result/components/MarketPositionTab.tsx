@@ -2,6 +2,7 @@ import { SkillAnalysisChart } from "./SkillAnalysisChart";
 import { CareerRecommendation } from "./CareerRecommendation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
 
 type SkillVector = {
   technicalSkill: number;
@@ -35,6 +36,19 @@ export function MarketPositionTab({
   careerVectors,
   isLoading,
 }: MarketPositionTabProps) {
+  const router = useRouter();
+
+  const handleCareerClick = (career: string) => {
+    router.push(`/my/${career}/roadmap`);
+  };
+
+  console.log(analysis);
+  console.log(careerVectors);
+  // マッチするキャリアのうち、careerVectorsに存在するもののみをフィルタリング
+  const validCareers = analysis.matchingCareers.filter(
+    (career) => careerVectors && career in careerVectors
+  );
+
   return (
     <div className="space-y-8">
       <Card className="border-blue-200">
@@ -60,7 +74,7 @@ export function MarketPositionTab({
 
               <CareerRecommendation
                 careerAdvice={analysis.careerAdvice}
-                matchingCareers={analysis.matchingCareers}
+                matchingCareers={validCareers} // フィルタリング済みの配列を渡す
                 careerVectors={careerVectors}
               />
             </div>
@@ -80,54 +94,58 @@ export function MarketPositionTab({
             <div className="flex justify-center items-center h-60">
               <p className="text-muted-foreground">分析中...</p>
             </div>
-          ) : (
+          ) : validCareers.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {analysis.matchingCareers.slice(0, 2).map((career) => (
-                <Card key={career} className="overflow-hidden">
+              {validCareers.slice(0, 2).map((career) => (
+                <Card
+                  key={career}
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleCareerClick(career)}
+                >
                   <CardHeader className="bg-muted pb-2">
                     <CardTitle className="text-base">
-                      {careerVectors[career].label}
+                      {careerVectors[career]?.label || career}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-4">
                     <div className="space-y-4">
                       <SkillComparisonItem
                         label="技術スキル"
-                        value={careerVectors[career].technicalSkill}
+                        value={careerVectors[career]?.technicalSkill || 0}
                         gap={
-                          careerVectors[career].technicalSkill -
+                          (careerVectors[career]?.technicalSkill || 0) -
                           analysis.targetVector.technicalSkill
                         }
                       />
                       <SkillComparisonItem
                         label="問題解決能力"
-                        value={careerVectors[career].problemSolving}
+                        value={careerVectors[career]?.problemSolving || 0}
                         gap={
-                          careerVectors[career].problemSolving -
+                          (careerVectors[career]?.problemSolving || 0) -
                           analysis.targetVector.problemSolving
                         }
                       />
                       <SkillComparisonItem
                         label="コミュニケーション"
-                        value={careerVectors[career].communication}
+                        value={careerVectors[career]?.communication || 0}
                         gap={
-                          careerVectors[career].communication -
+                          (careerVectors[career]?.communication || 0) -
                           analysis.targetVector.communication
                         }
                       />
                       <SkillComparisonItem
                         label="リーダーシップ"
-                        value={careerVectors[career].leadership}
+                        value={careerVectors[career]?.leadership || 0}
                         gap={
-                          careerVectors[career].leadership -
+                          (careerVectors[career]?.leadership || 0) -
                           analysis.targetVector.leadership
                         }
                       />
                       <SkillComparisonItem
                         label="ビジネス理解"
-                        value={careerVectors[career].businessAcumen}
+                        value={careerVectors[career]?.businessAcumen || 0}
                         gap={
-                          careerVectors[career].businessAcumen -
+                          (careerVectors[career]?.businessAcumen || 0) -
                           analysis.targetVector.businessAcumen
                         }
                       />
@@ -135,6 +153,10 @@ export function MarketPositionTab({
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">推奨キャリアパスが見つかりませんでした</p>
             </div>
           )}
         </CardContent>
@@ -162,9 +184,8 @@ function SkillComparisonItem({
           <span className="text-sm font-medium">{value.toFixed(1)}</span>
           {gap !== 0 && (
             <span
-              className={`ml-1 text-xs ${
-                gap > 0 ? "text-green-600" : "text-red-600"
-              }`}
+              className={`ml-1 text-xs ${gap > 0 ? "text-green-600" : "text-red-600"
+                }`}
             >
               {gap > 0 ? `+${gap.toFixed(1)}` : gap.toFixed(1)}
             </span>
