@@ -1,7 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Tabs } from "@/components/tabs/Tabs";
 import { CurrentPositionTab } from "@/components/tabs/current-position/CurrentPositionTab";
@@ -82,175 +80,36 @@ const tabs = [
   { id: "market", label: "市場におけるあなたの役割" },
 ];
 
-export default function DisplayPage() {
-  const searchParams = useSearchParams();
-  const [profileData, setProfileData] = useState({
-    name: "",
-    email: "",
-    canDo: "",
-    wantToDo: "",
-    dontWantToDo: "",
-  });
+const ResultPage = () => {
+  const profileData = {
+    name: "山田 太郎",
+    email: "yama@example.com",
+    canDo: "ソフトウェア開発、データ分析、ビジネスモデリング",
+    wantToDo: "データサイエンスの専門家として活躍",
+    dontWantToDo: "マーケティングのコンサルタントとして働くこと",
+  };
 
-  // AIによる分析結果のステート
-  const [analysis, setAnalysis] = useState({
+  const analysis = {
     currentVector: {
-      technicalSkill: 0,
-      problemSolving: 0,
-      communication: 0,
-      leadership: 0,
-      businessAcumen: 0,
+      technicalSkill: 3.5,
+      problemSolving: 3.5,
+      communication: 3.0,
+      leadership: 2.0,
+      businessAcumen: 2.0,
     },
     targetVector: {
-      technicalSkill: 0,
-      problemSolving: 0,
-      communication: 0,
-      leadership: 0,
-      businessAcumen: 0,
+      technicalSkill: 4.0,
+      problemSolving: 4.0,
+      communication: 3.5,
+      leadership: 3.0,
+      businessAcumen: 2.5,
     },
-    matchingCareers: [] as string[],
-    careerAdvice: "",
-  });
+    matchingCareers: ["Software Engineer", "Tech Lead", "Engineering Manager"],
+    careerAdvice:
+      "あなたの経験とスキルを分析した結果、ソフトウェアエンジニアの適性が最も高いと判断されました。",
+  };
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // クエリパラメータからデータを取得
-    const name = searchParams.get("name") || "";
-    const email = searchParams.get("email") || "";
-    const canDo = searchParams.get("canDo") || "";
-    const wantToDo = searchParams.get("wantToDo") || "";
-    const dontWantToDo = searchParams.get("dontWantToDo") || "";
-
-    setProfileData({
-      name,
-      email,
-      canDo,
-      wantToDo,
-      dontWantToDo,
-    });
-
-    // データが取得できたらAI分析結果をシミュレーション
-    if (canDo || wantToDo || dontWantToDo) {
-      // ここで本来はAIによる分析APIを呼び出します
-      // 今回はシミュレーションのためにランダムなデータを生成
-      setTimeout(() => {
-        // 基本ベクトルを生成（実際のアプリではAIが分析）
-        const currentVector = {
-          technicalSkill: Math.random() * 2.5 + 2, // 2.0-4.5の範囲
-          problemSolving: Math.random() * 2 + 2, // 2.0-4.0の範囲
-          communication: Math.random() * 2 + 1.5, // 1.5-3.5の範囲
-          leadership: Math.random() * 2 + 1, // 1.0-3.0の範囲
-          businessAcumen: Math.random() * 2 + 1, // 1.0-3.0の範囲
-        };
-
-        // 目標ベクトル（wantToDoに基づく）
-        const targetVector = {
-          technicalSkill: Math.min(
-            5,
-            currentVector.technicalSkill + Math.random() * 1.5
-          ), // 現在より少し高め
-          problemSolving: Math.min(
-            5,
-            currentVector.problemSolving + Math.random() * 1.5
-          ),
-          communication: Math.min(
-            5,
-            currentVector.communication + Math.random() * 1.5
-          ),
-          leadership: Math.min(
-            5,
-            currentVector.leadership + Math.random() * 1.5
-          ),
-          businessAcumen: Math.min(
-            5,
-            currentVector.businessAcumen + Math.random() * 1.5
-          ),
-        };
-
-        // マッチするキャリアパスを見つける（ベクトル間の距離を計算）
-        const matchingCareers = findMatchingCareers(targetVector);
-
-        // キャリアアドバイスの生成（実際にはAIによる生成）
-        const careerAdvice = generateCareerAdvice(
-          currentVector,
-          targetVector,
-          matchingCareers
-        );
-
-        setAnalysis({
-          currentVector,
-          targetVector,
-          matchingCareers,
-          careerAdvice,
-        });
-
-        setIsLoading(false);
-      }, 1000);
-    } else {
-      setIsLoading(false);
-    }
-  }, [searchParams, findMatchingCareers]);
-
-  // ターゲットベクトルに最も近いキャリアを見つける関数
-  function findMatchingCareers(targetVector: {
-    technicalSkill: number;
-    problemSolving: number;
-    communication: number;
-    leadership: number;
-    businessAcumen: number;
-  }) {
-    const careers = Object.keys(careerVectors);
-    const distances = careers.map((career) => {
-      const vector = careerVectors[career];
-      const distance = calculateDistance(targetVector, vector);
-      return { career, distance };
-    });
-
-    // 距離でソートして上位3つを取得
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, 3).map((item) => item.career);
-  }
-
-  // ベクトル間の距離を計算する関数（ユークリッド距離）
-  function calculateDistance(v1, v2) {
-    const dimensions = [
-      "technicalSkill",
-      "problemSolving",
-      "communication",
-      "leadership",
-      "businessAcumen",
-    ];
-    return Math.sqrt(
-      dimensions.reduce((sum, dim) => sum + Math.pow(v1[dim] - v2[dim], 2), 0)
-    );
-  }
-
-  // キャリアアドバイスを生成する関数
-  function generateCareerAdvice(current, target, matchingCareers) {
-    const firstMatch = careerVectors[matchingCareers[0]].label;
-
-    // 技術的なギャップの検出
-    const techGap = target.technicalSkill - current.technicalSkill;
-    const leadershipGap = target.leadership - current.leadership;
-    const businessGap = target.businessAcumen - current.businessAcumen;
-
-    let advice = `あなたの経験とスキルを分析した結果、${firstMatch}の適性が最も高いと判断されました。`;
-
-    if (techGap > 1) {
-      advice += ` 技術スキルをさらに高めるため、最新の開発手法や言語の学習を継続することをお勧めします。`;
-    }
-
-    if (leadershipGap > 1) {
-      advice += ` リーダーシップスキルを向上させるために、小規模なプロジェクトのリード経験を積むことが効果的でしょう。`;
-    }
-
-    if (businessGap > 1) {
-      advice += ` ビジネス理解を深めるため、製品戦略策定やステークホルダーとの対話の機会を増やすことをお勧めします。`;
-    }
-
-    return advice;
-  }
+  const isLoading = false;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -291,4 +150,6 @@ export default function DisplayPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ResultPage;

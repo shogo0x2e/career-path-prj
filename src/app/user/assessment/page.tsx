@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export default function ProfilePage() {
+const UserAssessmentPage = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -185,4 +185,6 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-}
+};
+
+export default UserAssessmentPage;
