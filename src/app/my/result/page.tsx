@@ -143,7 +143,7 @@ const ResultPage = () => {
         </Card>
 
         <div className="flex justify-center md:justify-start">
-          <Link href="/profile" passHref>
+          <Link href="/my/assessment" passHref>
             <Button variant="outline">入力画面に戻る</Button>
           </Link>
         </div>

@@ -35,7 +35,7 @@ const UserAssessmentPage = () => {
     alert("情報が正常に送信されました。");
 
     // 表示ページへリダイレクト
-    router.push(`/result?${params.toString()}`);
+    router.push("/my/result");
   };
 
   return (
