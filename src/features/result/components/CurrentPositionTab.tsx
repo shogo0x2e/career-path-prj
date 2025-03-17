@@ -33,13 +33,6 @@ export function CurrentPositionTab({
 }: CurrentPositionTabProps) {
   return (
     <div className="space-y-8">
-      <ProfileInfo
-        name={profileData.name}
-        email={profileData.email}
-        canDo={profileData.canDo}
-        wantToDo={profileData.wantToDo}
-        dontWantToDo={profileData.dontWantToDo}
-      />
 
       <Card className="border-purple-200">
         <CardHeader className="pb-2">
@@ -68,27 +61,22 @@ export function CurrentPositionTab({
                   <SkillBarItem
                     label="技術スキル"
                     value={currentVector.technicalSkill}
-                    color="bg-blue-500"
                   />
                   <SkillBarItem
                     label="問題解決能力"
                     value={currentVector.problemSolving}
-                    color="bg-green-500"
                   />
                   <SkillBarItem
                     label="コミュニケーション"
                     value={currentVector.communication}
-                    color="bg-yellow-500"
                   />
                   <SkillBarItem
                     label="リーダーシップ"
                     value={currentVector.leadership}
-                    color="bg-purple-500"
                   />
                   <SkillBarItem
                     label="ビジネス理解"
                     value={currentVector.businessAcumen}
-                    color="bg-red-500"
                   />
                 </div>
               </div>
@@ -96,6 +84,13 @@ export function CurrentPositionTab({
           )}
         </CardContent>
       </Card>
+      <ProfileInfo
+        name={profileData.name}
+        email={profileData.email}
+        canDo={profileData.canDo}
+        wantToDo={profileData.wantToDo}
+        dontWantToDo={profileData.dontWantToDo}
+      />
     </div>
   );
 }
