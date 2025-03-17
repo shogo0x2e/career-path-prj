@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Tabs } from "@/components/tabs/Tabs";
+import { Tabs } from "@/features/result/components/Tabs";
 import { CurrentPositionTab } from "@/features/result/components/CurrentPositionTab";
 import { MarketPositionTab } from "@/features/result/components/MarketPositionTab";
 import { Button } from "@/components/ui/button";
