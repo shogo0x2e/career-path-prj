@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 
 // エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
 const careerVectors = {
-  "Software Engineer": {
+  "SoftwareEngineer": {
     technicalSkill: 3.5,
     problemSolving: 3.5,
     communication: 3.0,
@@ -17,7 +17,7 @@ const careerVectors = {
     businessAcumen: 2.0,
     label: "ソフトウェアエンジニア",
   },
-  "Tech Lead": {
+  "TechLead": {
     technicalSkill: 4.5,
     problemSolving: 4.0,
     communication: 3.5,
@@ -25,7 +25,7 @@ const careerVectors = {
     businessAcumen: 2.5,
     label: "テックリード",
   },
-  "Engineering Manager": {
+  "EngineeringManager": {
     technicalSkill: 3.0,
     problemSolving: 3.5,
     communication: 4.0,
@@ -33,7 +33,7 @@ const careerVectors = {
     businessAcumen: 3.5,
     label: "エンジニアリングマネージャー",
   },
-  "Product Manager": {
+  "ProductManager": {
     technicalSkill: 2.5,
     problemSolving: 4.0,
     communication: 4.5,
@@ -41,7 +41,7 @@ const careerVectors = {
     businessAcumen: 4.5,
     label: "プロダクトマネージャー",
   },
-  "DevOps Engineer": {
+  "DevOpsEngineer": {
     technicalSkill: 4.0,
     problemSolving: 4.0,
     communication: 3.0,
@@ -49,7 +49,7 @@ const careerVectors = {
     businessAcumen: 2.5,
     label: "DevOpsエンジニア",
   },
-  "Full-stack Developer": {
+  "Full-stackDeveloper": {
     technicalSkill: 4.0,
     problemSolving: 3.8,
     communication: 3.2,
@@ -57,7 +57,7 @@ const careerVectors = {
     businessAcumen: 2.8,
     label: "フルスタック開発者",
   },
-  "Frontend Developer": {
+  "FrontendDeveloper": {
     technicalSkill: 3.8,
     problemSolving: 3.5,
     communication: 3.3,
@@ -65,7 +65,7 @@ const careerVectors = {
     businessAcumen: 2.5,
     label: "フロントエンド開発者",
   },
-  "Backend Developer": {
+  "BackendDeveloper": {
     technicalSkill: 4.2,
     problemSolving: 3.7,
     communication: 2.8,
@@ -104,7 +104,7 @@ const ResultPage = () => {
       leadership: 3.0,
       businessAcumen: 2.5,
     },
-    matchingCareers: ["Software Engineer", "Tech Lead", "Engineering Manager"],
+    matchingCareers: ["SoftwareEngineer", "TechLead", "EngineeringManager"],
     careerAdvice:
       "あなたの経験とスキルを分析した結果、ソフトウェアエンジニアの適性が最も高いと判断されました。",
   };
