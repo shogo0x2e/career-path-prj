@@ -1,42 +1,72 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { evaluateProfile } from "@/features/profile/actions/evaluateProfile";
+import { evaluateState } from "@/atoms/evaluate-state";
+import { useAtom } from "jotai";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { FullLoadingSpinner } from "@/components/full-loading-spinner";
+import { ZodError } from "zod";
+
+type FormData = {
+  currentSkills: string;
+  desiredWork: string;
+  unwantedWork: string;
+};
 
 const UserAssessmentPage = () => {
   const router = useRouter();
+  const [, setEvaluatedState] = useAtom(evaluateState);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | undefined>(
+    undefined
+  );
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    canDo: "", // できること
-    wantToDo: "", // やりたいこと
-    dontWantToDo: "", // やりたくないこと
-  });
+  const currentSkills = watch("currentSkills");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // URLパラメータでデータを渡す
-    const params = new URLSearchParams();
-    Object.entries(formData).forEach(([key, value]) => {
-      params.append(key, value);
+  const generateAndNavigate = async (data: FormData) => {
+    setIsGenerating(true);
+    const profile = await evaluateProfile({
+      currentSkills: data.currentSkills,
+      desiredWork: data.desiredWork,
+      unwantedWork: data.unwantedWork,
     });
 
-    // トースト通知の代わりに
-    alert("情報が正常に送信されました。");
-
-    // 表示ページへリダイレクト
-    router.push("/my/result");
+    if (currentSkills.length !== 0) {
+      setEvaluatedState(profile);
+      router.push("/my/result");
+    }
   };
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      generateAndNavigate(data);
+    } catch (error) {
+      console.error("評価処理でエラーが発生しました:", error);
+      if (error instanceof ZodError) {
+        setPendingMessage("AI の分析に時間がかかっています...");
+        try {
+          generateAndNavigate(data);
+        } catch {
+          alert(
+            "AI が解析に失敗しました。もう一度お試しいただくか、プロフィールの内容を書き換えた上で再度お試しください。"
+          );
+        }
+      }
+    }
+  };
+
+  if (isGenerating) {
+    return <FullLoadingSpinner message={pendingMessage ?? "AI が分析中..."} />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -51,56 +81,13 @@ const UserAssessmentPage = () => {
         </h1>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className={cn(
             "bg-white shadow-md rounded-lg p-6",
             "border border-gray-200"
           )}
         >
           <div className="space-y-6">
-            {/* 基本情報セクション */}
-            <div className="border-b border-gray-200 pb-4">
-              <h2 className="text-xl font-semibold mb-4">基本情報</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label
-                    htmlFor="name"
-                    className="block font-medium text-gray-700"
-                  >
-                    お名前 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="山田 太郎"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label
-                    htmlFor="email"
-                    className="block font-medium text-gray-700"
-                  >
-                    メールアドレス <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="example@mail.com"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* キャリアプランニングセクション */}
             <div>
               <h2 className="text-xl font-semibold mb-4">
@@ -111,35 +98,44 @@ const UserAssessmentPage = () => {
                 {/* できること */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="canDo"
+                    htmlFor="currentSkills"
                     className="block font-medium text-gray-700"
                   >
                     できること
+                    <span className="text-red-500">*</span>
                   </label>
                   <textarea
-                    id="canDo"
-                    name="canDo"
-                    value={formData.canDo}
-                    onChange={handleChange}
+                    id="currentSkills"
+                    {...register("currentSkills", {
+                      required: "このフィールドは必須です",
+                    })}
                     placeholder="あなたのスキルや得意なこと、これまでの実績などを記入してください"
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={cn(
+                      "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      errors.currentSkills
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    )}
                   />
+                  {errors.currentSkills && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.currentSkills.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* やりたいこと */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="wantToDo"
+                    htmlFor="desiredWork"
                     className="block font-medium text-gray-700"
                   >
                     やりたいこと
                   </label>
                   <textarea
-                    id="wantToDo"
-                    name="wantToDo"
-                    value={formData.wantToDo}
-                    onChange={handleChange}
+                    id="desiredWork"
+                    {...register("desiredWork")}
                     placeholder="今後チャレンジしたい領域や、興味のある技術、目指したいキャリアパスなどを記入してください"
                     rows={5}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -149,16 +145,14 @@ const UserAssessmentPage = () => {
                 {/* やりたくないこと */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="dontWantToDo"
+                    htmlFor="unwantedWork"
                     className="block font-medium text-gray-700"
                   >
                     やりたくないこと
                   </label>
                   <textarea
-                    id="dontWantToDo"
-                    name="dontWantToDo"
-                    value={formData.dontWantToDo}
-                    onChange={handleChange}
+                    id="unwantedWork"
+                    {...register("unwantedWork")}
                     placeholder="避けたい業務や環境、関わりたくない技術などを記入してください"
                     rows={5}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -3,77 +3,17 @@
 import Link from "next/link";
 import { Tabs } from "@/features/result/components/Tabs";
 import { CurrentPositionTab } from "@/features/result/components/CurrentPositionTab";
-import { MarketPositionTab } from "@/features/result/components/MarketPositionTab";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-// エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
-const careerVectors = {
-  "SoftwareEngineer": {
-    technicalSkill: 3.5,
-    problemSolving: 3.5,
-    communication: 3.0,
-    leadership: 2.0,
-    businessAcumen: 2.0,
-    label: "ソフトウェアエンジニア",
-  },
-  "TechLead": {
-    technicalSkill: 4.5,
-    problemSolving: 4.0,
-    communication: 3.5,
-    leadership: 3.5,
-    businessAcumen: 2.5,
-    label: "テックリード",
-  },
-  "EngineeringManager": {
-    technicalSkill: 3.0,
-    problemSolving: 3.5,
-    communication: 4.0,
-    leadership: 4.5,
-    businessAcumen: 3.5,
-    label: "エンジニアリングマネージャー",
-  },
-  "ProductManager": {
-    technicalSkill: 2.5,
-    problemSolving: 4.0,
-    communication: 4.5,
-    leadership: 3.5,
-    businessAcumen: 4.5,
-    label: "プロダクトマネージャー",
-  },
-  "DevOpsEngineer": {
-    technicalSkill: 4.0,
-    problemSolving: 4.0,
-    communication: 3.0,
-    leadership: 2.5,
-    businessAcumen: 2.5,
-    label: "DevOpsエンジニア",
-  },
-  "Full-stackDeveloper": {
-    technicalSkill: 4.0,
-    problemSolving: 3.8,
-    communication: 3.2,
-    leadership: 2.5,
-    businessAcumen: 2.8,
-    label: "フルスタック開発者",
-  },
-  "FrontendDeveloper": {
-    technicalSkill: 3.8,
-    problemSolving: 3.5,
-    communication: 3.3,
-    leadership: 2.0,
-    businessAcumen: 2.5,
-    label: "フロントエンド開発者",
-  },
-  "BackendDeveloper": {
-    technicalSkill: 4.2,
-    problemSolving: 3.7,
-    communication: 2.8,
-    leadership: 2.0,
-    businessAcumen: 2.2,
-    label: "バックエンド開発者",
-  },
-};
+import { useAtom } from "jotai";
+import { evaluateState } from "@/atoms/evaluate-state";
+import { useRouter } from "next/navigation";
+import { getDistance } from "@/utils/get-distance";
+import { careerVectors } from "@/constants/career-vectors";
+import { evaluateRoadMap } from "@/features/roadmap/actions/evaluateRoadMap";
+import { generatedRoadmapsState } from "@/atoms/generated-roadmaps-state";
+import { useState } from "react";
+import { FullLoadingSpinner } from "@/components/full-loading-spinner";
 
 const tabs = [
   { id: "current", label: "あなたの現在地" },
@@ -81,35 +21,52 @@ const tabs = [
 ];
 
 const ResultPage = () => {
-  const profileData = {
-    name: "山田 太郎",
-    email: "yama@example.com",
-    canDo: "ソフトウェア開発、データ分析、ビジネスモデリング",
-    wantToDo: "データサイエンスの専門家として活躍",
-    dontWantToDo: "マーケティングのコンサルタントとして働くこと",
+  const [evaluatedState] = useAtom(evaluateState);
+  const [generatedRoadmaps, setGeneratedRoadmaps] = useAtom(
+    generatedRoadmapsState
+  );
+  const [isGenerating, setIsGenerating] = useState(false);
+  const router = useRouter();
+  if (!evaluatedState) {
+    router.push("/my/assessment");
+    return null;
+  }
+
+  const onCareerClick = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsGenerating(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    const career = formData.get("career");
+
+    if (!career) {
+      setIsGenerating(false);
+      return;
+    }
+
+    try {
+      const roadmap = await evaluateRoadMap(
+        evaluatedState.profileSummary,
+        career as keyof typeof careerVectors
+      );
+
+      setGeneratedRoadmaps({
+        ...generatedRoadmaps,
+        [career as string]: roadmap,
+      });
+
+      setIsGenerating(false);
+
+      router.push(`/my/${career}/roadmap`);
+    } catch (error) {
+      console.error(error);
+      setIsGenerating(false);
+      return;
+    }
   };
 
-  const analysis = {
-    currentVector: {
-      technicalSkill: 3.5,
-      problemSolving: 3.5,
-      communication: 3.0,
-      leadership: 2.0,
-      businessAcumen: 2.0,
-    },
-    targetVector: {
-      technicalSkill: 4.0,
-      problemSolving: 4.0,
-      communication: 3.5,
-      leadership: 3.0,
-      businessAcumen: 2.5,
-    },
-    matchingCareers: ["SoftwareEngineer", "TechLead", "EngineeringManager"],
-    careerAdvice:
-      "あなたの経験とスキルを分析した結果、ソフトウェアエンジニアの適性が最も高いと判断されました。",
-  };
-
-  const isLoading = false;
+  if (isGenerating) {
+    return <FullLoadingSpinner message="ロードマップを生成中..." />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -124,18 +81,77 @@ const ResultPage = () => {
               <>
                 {activeTabId === "current" && (
                   <CurrentPositionTab
-                    profileData={profileData}
-                    currentVector={analysis.currentVector}
-                    isLoading={isLoading}
+                    profileData={{
+                      canDo: evaluatedState?.profileSummary.currentSkills,
+                      wantToDo:
+                        evaluatedState?.profileSummary.desiredWork ??
+                        "まだ見つかっていない",
+                      dontWantToDo: evaluatedState?.profileSummary.unwantedWork,
+                    }}
+                    skillEvaluation={{
+                      current: {
+                        ...evaluatedState.hardSkillEvaluation.current,
+                        ...evaluatedState.softSkillEvaluation.current,
+                      },
+                      desired: {
+                        ...evaluatedState.hardSkillEvaluation.desired,
+                        ...evaluatedState.softSkillEvaluation.desired,
+                      },
+                    }}
+                    isLoading={false}
                   />
                 )}
 
                 {activeTabId === "market" && (
-                  <MarketPositionTab
-                    analysis={analysis}
-                    careerVectors={careerVectors}
-                    isLoading={isLoading}
-                  />
+                  // <MarketPositionTab
+                  //   analysis={analysis}
+                  //   careerVectors={careerVectors}
+                  //   isLoading={isLoading}
+                  // />
+                  <div className="space-y-6 w-full">
+                    <h2 className="text-xl font-semibold">
+                      あなたの目標に近いキャリアパス
+                    </h2>
+                    {Object.entries(careerVectors)
+                      .map(([key, vector]) => ({
+                        key,
+                        vector,
+                        distance: getDistance(
+                          {
+                            ...evaluatedState.hardSkillEvaluation.desired,
+                            ...evaluatedState.softSkillEvaluation.desired,
+                          },
+                          vector
+                        ),
+                      }))
+                      .sort((a, b) => a.distance - b.distance)
+                      .slice(0, 3)
+                      .map(({ key, vector, distance }) => (
+                        <form key={key} onSubmit={onCareerClick}>
+                          <input type="hidden" name="career" value={key} />
+                          <button
+                            type="submit"
+                            className="hover:cursor-pointer w-full"
+                          >
+                            <Card key={key} className="p-4">
+                              <div className="grid grid-cols-1 gap-2">
+                                <h3 className="text-lg font-medium">
+                                  {vector.label}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  類似度:{" "}
+                                  {(
+                                    100 *
+                                    (1 - distance / Math.sqrt(56))
+                                  ).toFixed(0)}{" "}
+                                  %
+                                </p>
+                              </div>
+                            </Card>
+                          </button>
+                        </form>
+                      ))}
+                  </div>
                 )}
               </>
             )}

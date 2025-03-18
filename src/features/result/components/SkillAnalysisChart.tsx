@@ -1,3 +1,5 @@
+import { HardSkillEvaluation } from "@/features/profile/actions/generateHardSkillEvaluationPrompt";
+import { SoftSkillEvaluation } from "@/features/profile/actions/generateSoftSkillEvaluationPrompt";
 import {
   Radar,
   RadarChart,
@@ -8,55 +10,59 @@ import {
   Legend,
 } from "recharts";
 
-type SkillVector = {
-  technicalSkill: number;
-  problemSolving: number;
-  communication: number;
-  leadership: number;
-  businessAcumen: number;
-};
+type SkillEvaluation = SoftSkillEvaluation & HardSkillEvaluation;
 
 type SkillAnalysisChartProps = {
-  currentVector: SkillVector;
-  targetVector?: SkillVector;
+  skillEvaluation: SkillEvaluation;
   showCurrentOnly?: boolean;
 };
 
 export function SkillAnalysisChart({
-  currentVector,
-  targetVector,
+  skillEvaluation,
   showCurrentOnly = false,
 }: SkillAnalysisChartProps) {
   // レーダーチャート用のデータ整形
   const chartData = [
     {
-      subject: "技術スキル",
-      currentValue: currentVector.technicalSkill,
-      targetValue: targetVector?.technicalSkill,
+      subject: "プログラミング",
+      currentValue: skillEvaluation.current.programming,
+      targetValue: skillEvaluation.desired.programming,
       fullMark: 5,
     },
     {
-      subject: "問題解決",
-      currentValue: currentVector.problemSolving,
-      targetValue: targetVector?.problemSolving,
+      subject: "データベース",
+      currentValue: skillEvaluation.current.database,
+      targetValue: skillEvaluation.desired.database,
+      fullMark: 5,
+    },
+    {
+      subject: "ソフトウェア開発",
+      currentValue: skillEvaluation.current.softwareDevelopment,
+      targetValue: skillEvaluation.desired.softwareDevelopment,
+      fullMark: 5,
+    },
+    {
+      subject: "システム設計",
+      currentValue: skillEvaluation.current.systemDesign,
+      targetValue: skillEvaluation.desired.systemDesign,
       fullMark: 5,
     },
     {
       subject: "コミュニケーション",
-      currentValue: currentVector.communication,
-      targetValue: targetVector?.communication,
+      currentValue: skillEvaluation.current.communication,
+      targetValue: skillEvaluation.desired.communication,
+      fullMark: 5,
+    },
+    {
+      subject: "チームワーク",
+      currentValue: skillEvaluation.current.teamwork,
+      targetValue: skillEvaluation.desired.teamwork,
       fullMark: 5,
     },
     {
       subject: "リーダーシップ",
-      currentValue: currentVector.leadership,
-      targetValue: targetVector?.leadership,
-      fullMark: 5,
-    },
-    {
-      subject: "ビジネス理解",
-      currentValue: currentVector.businessAcumen,
-      targetValue: targetVector?.businessAcumen,
+      currentValue: skillEvaluation.current.leadership,
+      targetValue: skillEvaluation.desired.leadership,
       fullMark: 5,
     },
   ];
@@ -80,7 +86,7 @@ export function SkillAnalysisChart({
             fillOpacity={0.5}
           />
 
-          {!showCurrentOnly && targetVector && (
+          {!showCurrentOnly && skillEvaluation.desired && (
             <Radar
               name="目標スキル"
               dataKey="targetValue"
