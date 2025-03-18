@@ -1,9 +1,5 @@
-import { CareerVector } from "@/features/profile/types";
-
 // エンジニア職種とスキルベクトルのマッピング（5次元のスキルマップ）
-export const careerVectors: {
-  [key: string]: CareerVector & { label: string };
-} = {
+export const careerVectors = {
   TechLead: {
     programming: 4,
     softwareDevelopment: 5,
@@ -84,4 +80,4 @@ export const careerVectors: {
     leadership: 2,
     label: "モバイルエンジニア",
   },
-};
+} as const;

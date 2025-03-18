@@ -8,18 +8,17 @@ export type TimelineItem = {
   title: string;
   description: string;
   durationMonths: number; // 月数で保存
-  durationText: string;   // 表示用
+  durationText: string; // 表示用
   skills?: string[];
   date?: string;
 };
 
 type TimelineProps = {
   items: TimelineItem[];
-  currentPosition: string;
   targetCareer: string;
 };
 
-export function Timeline({ items, currentPosition, targetCareer }: TimelineProps) {
+export function Timeline({ items, targetCareer }: TimelineProps) {
   // 総月数を計算
   const totalMonths = items.reduce((sum, item) => sum + item.durationMonths, 0);
   // 年と月に変換
@@ -47,7 +46,10 @@ export function Timeline({ items, currentPosition, targetCareer }: TimelineProps
 
         {/* 進捗バー */}
         <div className="mb-2">
-          <Progress value={0} className="bg-gray-200 h-2 border border-gray-300" />
+          <Progress
+            value={0}
+            className="bg-gray-200 h-2 border border-gray-300"
+          />
         </div>
 
         <div className="flex justify-between text-xs text-muted-foreground">
@@ -61,7 +63,7 @@ export function Timeline({ items, currentPosition, targetCareer }: TimelineProps
         <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-blue-500 z-10" />
         <div className="mb-10">
           <p className="text-sm font-medium text-blue-500">現在</p>
-          <h3 className="text-xl font-semibold mt-1">{currentPosition}</h3>
+          <h3 className="text-xl font-semibold mt-1">現在のポジション</h3>
           <p className="text-sm text-muted-foreground mt-1">スタート地点</p>
         </div>
 
@@ -78,7 +80,9 @@ export function Timeline({ items, currentPosition, targetCareer }: TimelineProps
               <div className="absolute left-[-9px] w-4 h-4 rounded-full bg-primary z-10" />
 
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">{item.durationText}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {item.durationText}
+                </p>
                 <p className="text-xs text-slate-500">
                   {/* 累積時間の表示 */}
                   <span className="font-medium">
@@ -104,15 +108,23 @@ export function Timeline({ items, currentPosition, targetCareer }: TimelineProps
 
               <Card className="p-4 mt-2">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {item.description}
+                </p>
                 {item.skills && item.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
                     {item.skills.map((skill) => (
-                      <Badge key={skill} variant="outline">{skill}</Badge>
+                      <Badge key={skill} variant="outline">
+                        {skill}
+                      </Badge>
                     ))}
                   </div>
                 )}
-                {item.date && <p className="text-xs text-muted-foreground mt-3">{item.date}</p>}
+                {item.date && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    {item.date}
+                  </p>
+                )}
               </Card>
             </div>
           );

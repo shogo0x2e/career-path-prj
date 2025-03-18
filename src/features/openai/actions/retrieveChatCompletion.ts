@@ -21,6 +21,8 @@ export async function retrieveChatCompletion(prompt: string) {
       max_tokens: 1000,
     });
 
+    console.log(completion.choices[0].message.content);
+
     return completion.choices[0].message.content;
   } catch (error) {
     console.error("Error in chat completion:", error);

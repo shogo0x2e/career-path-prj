@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Tabs } from "@/features/result/components/Tabs";
 import { CurrentPositionTab } from "@/features/result/components/CurrentPositionTab";
-import { MarketPositionTab } from "@/features/result/components/MarketPositionTab";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAtom } from "jotai";
@@ -11,6 +10,8 @@ import { evaluateState } from "@/atoms/evaluate-state";
 import { useRouter } from "next/navigation";
 import { getDistance } from "@/utils/get-ditance";
 import { careerVectors } from "@/constants/career-vectors";
+import { evaluateRoadMap } from "@/features/roadmap/actions/evaluateRoadMap";
+import { generatedRoadmapsState } from "@/atoms/generated-roadmaps-state";
 
 const tabs = [
   { id: "current", label: "あなたの現在地" },
@@ -19,11 +20,32 @@ const tabs = [
 
 const ResultPage = () => {
   const [evaluatedState] = useAtom(evaluateState);
+  const [generatedRoadmaps, setGeneratedRoadmaps] = useAtom(
+    generatedRoadmapsState
+  );
   const router = useRouter();
   if (!evaluatedState) {
     router.push("/my/assessment");
     return null;
   }
+
+  const onCareerClick = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const career = formData.get("career");
+
+    const roadmap = await evaluateRoadMap(
+      evaluatedState.profileSummary,
+      career as keyof typeof careerVectors
+    );
+
+    setGeneratedRoadmaps({
+      ...generatedRoadmaps,
+      [career as string]: roadmap,
+    });
+
+    router.push(`/my/${career}/roadmap`);
+  };
 
   const isLoading = false;
 
@@ -86,21 +108,24 @@ const ResultPage = () => {
                       .sort((a, b) => a.distance - b.distance)
                       .slice(0, 3)
                       .map(({ key, vector, distance }) => (
-                        <Link href={`/my/${key}/roadmap`} key={key}>
-                          <Card key={key} className="p-4">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <h3 className="text-lg font-medium">
-                                  {vector.label}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                  スキルベクトル類似度:{" "}
-                                  {(1 - distance / Math.sqrt(56)).toFixed(2)}
-                                </p>
+                        <form key={key} onSubmit={onCareerClick}>
+                          <input type="hidden" name="career" value={key} />
+                          <button type="submit">
+                            <Card key={key} className="p-4">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <h3 className="text-lg font-medium">
+                                    {vector.label}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    スキルベクトル類似度:{" "}
+                                    {(1 - distance / Math.sqrt(56)).toFixed(2)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                          </Card>
-                        </Link>
+                            </Card>
+                          </button>
+                        </form>
                       ))}
                   </div>
                 )}
