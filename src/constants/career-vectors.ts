@@ -40,7 +40,7 @@ export const careerVectors = {
     leadership: 3,
     label: "DevOpsエンジニア",
   },
-  "Full-stackDeveloper": {
+  FullStackDeveloper: {
     programming: 5,
     softwareDevelopment: 4,
     database: 4,

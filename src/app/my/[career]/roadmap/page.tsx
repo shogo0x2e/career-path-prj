@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Timeline } from "@/features/roadmap/components/Timeline";
 import { generatedRoadmapsState } from "@/atoms/generated-roadmaps-state";
 import { useAtom } from "jotai";
-
+import { careerVectors } from "@/constants/career-vectors";
+import { useRouter } from "next/navigation";
 // モックデータ
 // const careerRoadmapData: Record<string, {
 //   label: string;
@@ -192,13 +193,15 @@ const formatCareerPathKey = (career: string) => {
 
 export default function RoadmapPage() {
   const params = useParams();
+  const router = useRouter();
   const careerKey = params.career as string;
   const formattedCareerKey = formatCareerPathKey(careerKey);
 
   const [generatedRoadmaps] = useAtom(generatedRoadmapsState);
 
   if (!generatedRoadmaps) {
-    return <div>ロードマップが生成されていません</div>;
+    router.push("/my/assessment");
+    return null;
   }
 
   // データが存在しない場合のフォールバック
@@ -213,7 +216,8 @@ export default function RoadmapPage() {
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl md:text-3xl font-bold">
-            {roadmapData.label}へのロードマップ
+            {careerVectors[careerKey as keyof typeof careerVectors].label}
+            へのロードマップ
           </h1>
           <Link href="/my/result" passHref>
             <Button variant="outline">結果に戻る</Button>

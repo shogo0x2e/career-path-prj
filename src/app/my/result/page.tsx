@@ -12,6 +12,8 @@ import { getDistance } from "@/utils/get-distance";
 import { careerVectors } from "@/constants/career-vectors";
 import { evaluateRoadMap } from "@/features/roadmap/actions/evaluateRoadMap";
 import { generatedRoadmapsState } from "@/atoms/generated-roadmaps-state";
+import { useState } from "react";
+import { FullLoadingSpinner } from "@/components/full-loading-spinner";
 
 const tabs = [
   { id: "current", label: "あなたの現在地" },
@@ -23,6 +25,7 @@ const ResultPage = () => {
   const [generatedRoadmaps, setGeneratedRoadmaps] = useAtom(
     generatedRoadmapsState
   );
+  const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
   if (!evaluatedState) {
     router.push("/my/assessment");
@@ -31,23 +34,39 @@ const ResultPage = () => {
 
   const onCareerClick = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsGenerating(true);
     const formData = new FormData(e.target as HTMLFormElement);
     const career = formData.get("career");
 
-    const roadmap = await evaluateRoadMap(
-      evaluatedState.profileSummary,
-      career as keyof typeof careerVectors
-    );
+    if (!career) {
+      setIsGenerating(false);
+      return;
+    }
 
-    setGeneratedRoadmaps({
-      ...generatedRoadmaps,
-      [career as string]: roadmap,
-    });
+    try {
+      const roadmap = await evaluateRoadMap(
+        evaluatedState.profileSummary,
+        career as keyof typeof careerVectors
+      );
 
-    router.push(`/my/${career}/roadmap`);
+      setGeneratedRoadmaps({
+        ...generatedRoadmaps,
+        [career as string]: roadmap,
+      });
+
+      setIsGenerating(false);
+
+      router.push(`/my/${career}/roadmap`);
+    } catch (error) {
+      console.error(error);
+      setIsGenerating(false);
+      return;
+    }
   };
 
-  const isLoading = false;
+  if (isGenerating) {
+    return <FullLoadingSpinner message="ロードマップを生成中..." />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -79,7 +98,7 @@ const ResultPage = () => {
                         ...evaluatedState.softSkillEvaluation.desired,
                       },
                     }}
-                    isLoading={isLoading}
+                    isLoading={false}
                   />
                 )}
 
@@ -112,7 +131,7 @@ const ResultPage = () => {
                           <input type="hidden" name="career" value={key} />
                           <button
                             type="submit"
-                            className="hover:cursor-pointer"
+                            className="hover:cursor-pointer w-full"
                           >
                             <Card key={key} className="p-4">
                               <div className="grid grid-cols-1 gap-2">
@@ -120,8 +139,12 @@ const ResultPage = () => {
                                   {vector.label}
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                  スキルベクトル類似度:{" "}
-                                  {(1 - distance / Math.sqrt(56)).toFixed(2)}
+                                  類似度:{" "}
+                                  {(
+                                    100 *
+                                    (1 - distance / Math.sqrt(56))
+                                  ).toFixed(0)}{" "}
+                                  %
                                 </p>
                               </div>
                             </Card>

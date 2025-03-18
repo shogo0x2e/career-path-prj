@@ -6,6 +6,9 @@ import { evaluateProfile } from "@/features/profile/actions/evaluateProfile";
 import { evaluateState } from "@/atoms/evaluate-state";
 import { useAtom } from "jotai";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { FullLoadingSpinner } from "@/components/full-loading-spinner";
+import { ZodError } from "zod";
 
 type FormData = {
   currentSkills: string;
@@ -16,22 +19,54 @@ type FormData = {
 const UserAssessmentPage = () => {
   const router = useRouter();
   const [, setEvaluatedState] = useAtom(evaluateState);
-  const { register, handleSubmit } = useForm<FormData>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | undefined>(
+    undefined
+  );
+
+  const currentSkills = watch("currentSkills");
+
+  const generateAndNavigate = async (data: FormData) => {
+    setIsGenerating(true);
+    const profile = await evaluateProfile({
+      currentSkills: data.currentSkills,
+      desiredWork: data.desiredWork,
+      unwantedWork: data.unwantedWork,
+    });
+
+    if (currentSkills.length !== 0) {
+      setEvaluatedState(profile);
+      router.push("/my/result");
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
-      const profile = await evaluateProfile({
-        currentSkills: data.currentSkills,
-        desiredWork: data.desiredWork,
-        unwantedWork: data.unwantedWork,
-      });
-
-      setEvaluatedState(profile);
-      router.push("/my/result");
+      generateAndNavigate(data);
     } catch (error) {
       console.error("評価処理でエラーが発生しました:", error);
+      if (error instanceof ZodError) {
+        setPendingMessage("AI の分析に時間がかかっています...");
+        try {
+          generateAndNavigate(data);
+        } catch {
+          alert(
+            "AI が解析に失敗しました。もう一度お試しいただくか、プロフィールの内容を書き換えた上で再度お試しください。"
+          );
+        }
+      }
     }
   };
+
+  if (isGenerating) {
+    return <FullLoadingSpinner message={pendingMessage ?? "AI が分析中..."} />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -67,14 +102,27 @@ const UserAssessmentPage = () => {
                     className="block font-medium text-gray-700"
                   >
                     できること
+                    <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="currentSkills"
-                    {...register("currentSkills")}
+                    {...register("currentSkills", {
+                      required: "このフィールドは必須です",
+                    })}
                     placeholder="あなたのスキルや得意なこと、これまでの実績などを記入してください"
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={cn(
+                      "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                      errors.currentSkills
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    )}
                   />
+                  {errors.currentSkills && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.currentSkills.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* やりたいこと */}

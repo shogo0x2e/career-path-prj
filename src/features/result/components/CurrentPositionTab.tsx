@@ -26,12 +26,6 @@ export function CurrentPositionTab({
 }: CurrentPositionTabProps) {
   return (
     <div className="space-y-8">
-      <ProfileInfo
-        canDo={profileData.canDo}
-        wantToDo={profileData.wantToDo}
-        dontWantToDo={profileData.dontWantToDo}
-      />
-
       <Card className="border-purple-200">
         <CardHeader className="pb-2">
           <CardTitle className="text-xl text-purple-700">
@@ -56,6 +50,11 @@ export function CurrentPositionTab({
           )}
         </CardContent>
       </Card>
+      <ProfileInfo
+        canDo={profileData.canDo}
+        wantToDo={profileData.wantToDo}
+        dontWantToDo={profileData.dontWantToDo}
+      />
     </div>
   );
 }
