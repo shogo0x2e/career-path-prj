@@ -52,41 +52,10 @@ export function CurrentPositionTab({
                   showCurrentOnly={true}
                 />
               </div>
-
-              {/* <div className="mt-6 pt-4 border-t border-muted">
-                <h3 className="font-medium text-lg mb-3">スキル分析</h3>
-                <div className="space-y-4">
-                  <SkillBarItem
-                    label="技術スキル"
-                    value={currentVector.technicalSkill}
-                  />
-                  <SkillBarItem
-                    label="問題解決能力"
-                    value={currentVector.problemSolving}
-                  />
-                  <SkillBarItem
-                    label="コミュニケーション"
-                    value={currentVector.communication}
-                  />
-                  <SkillBarItem
-                    label="リーダーシップ"
-                    value={currentVector.leadership}
-                  />
-                  <SkillBarItem
-                    label="ビジネス理解"
-                    value={currentVector.businessAcumen}
-                  />
-                </div>
-              </div> */}
             </div>
           )}
         </CardContent>
       </Card>
-      <ProfileInfo
-        canDo={profileData.canDo}
-        wantToDo={profileData.wantToDo}
-        dontWantToDo={profileData.dontWantToDo}
-      />
     </div>
   );
 }

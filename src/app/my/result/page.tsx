@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useAtom } from "jotai";
 import { evaluateState } from "@/atoms/evaluate-state";
 import { useRouter } from "next/navigation";
-import { getDistance } from "@/utils/get-ditance";
+import { getDistance } from "@/utils/get-distance";
 import { careerVectors } from "@/constants/career-vectors";
 import { evaluateRoadMap } from "@/features/roadmap/actions/evaluateRoadMap";
 import { generatedRoadmapsState } from "@/atoms/generated-roadmaps-state";
@@ -89,7 +89,7 @@ const ResultPage = () => {
                   //   careerVectors={careerVectors}
                   //   isLoading={isLoading}
                   // />
-                  <div className="space-y-6">
+                  <div className="space-y-6 w-full">
                     <h2 className="text-xl font-semibold">
                       あなたの目標に近いキャリアパス
                     </h2>
@@ -110,18 +110,19 @@ const ResultPage = () => {
                       .map(({ key, vector, distance }) => (
                         <form key={key} onSubmit={onCareerClick}>
                           <input type="hidden" name="career" value={key} />
-                          <button type="submit">
+                          <button
+                            type="submit"
+                            className="hover:cursor-pointer"
+                          >
                             <Card key={key} className="p-4">
-                              <div className="flex justify-between items-center">
-                                <div>
-                                  <h3 className="text-lg font-medium">
-                                    {vector.label}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">
-                                    スキルベクトル類似度:{" "}
-                                    {(1 - distance / Math.sqrt(56)).toFixed(2)}
-                                  </p>
-                                </div>
+                              <div className="grid grid-cols-1 gap-2">
+                                <h3 className="text-lg font-medium">
+                                  {vector.label}
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                  スキルベクトル類似度:{" "}
+                                  {(1 - distance / Math.sqrt(56)).toFixed(2)}
+                                </p>
                               </div>
                             </Card>
                           </button>
